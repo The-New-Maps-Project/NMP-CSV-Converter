@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>822GenerateCSV</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <h1>Generate CSV</h1>
+    <h3>Get the lat and lng of each city from Google Geocoding API</h3>
+    <div>Must have a Google Cloud API Key to use</div>
+    <p>
+      Put in data in the following format: # (tab) City (tab)Name (tab)
+      Population<br />
+      Outputs data in the black box in the following format: City, Population,
+      Lat, Long. <br />Meant to be used with table data from Demographics by
+      Cubit websites for each state, in the above format (with ties, which this
+      program takes care of)
+    </p>
+
+    <div id="interval-text">
+      Interval between Google API Calls:
+      <input type="number" id="millisecondInterval" /> (in ms). Default is 400.
+      Check the Google API Dashboard for the average latency (ms) for your
+      Geocoding API.
+    </div>
+
+    <div id="apikey-input">
+      <input type="text" placeholder="Google Cloud API Key" id="api-key" />
+      BEWARE: each line counted is one geocoding API Call to this key
+    </div>
+
+    <div id="stateName-wrapper">
+      <input
+        type="text"
+        placeholder="State name, for google search"
+        id="stateName"
+      />
+    </div>
+    <br />
+
+    <div id="inputall">
+      <textarea
+        rows="10"
+        cols="70"
+        name="inputfile"
+        placeholder="Tabulated Data here"
+        id="inputtext"
+      ></textarea>
+      <br />
+      <button type="button" id="submit">Convert Now</button>
+    </div>
+
+    <div id="wait"></div>
+    <br />
+    <br />
+    <div id="count"></div>
+    <div id="main" style="padding: 30px; border: solid black 3px;">
+      <button type="button" id="copy-clipboard" onclick="copyTextArea()">
+        Copy
+      </button>
+    </div>
+
+    <script type="text/javascript">
+      document.getElementById("inputall").style.display = "none";
+      document.getElementById("submit").addEventListener("click", () => {
+        const apiKey = document.getElementById("api-key").value;
+        const millisecondInterval =
+          document.getElementById("millisecondInterval").value || 400;
+        document.getElementById("wait").textContent = "Please Wait";
+        const data = document.getElementById("inputtext").value;
+        var lines = data.split("\n");
+        var wait = (lines.length * millisecondInterval) / 1000;
+        document.getElementById("wait").textContent =
+          "Please Wait " +
+          wait +
+          "secs to finish. Maximize memory on your computer to decrease latency and minimize errors";
+        var count = 0;
+        const stateName = document.getElementById("stateName").value;
+        const countDOM = document.getElementById("count");
+        var lineCount = 0;
+        lines.forEach((e) => {
+          //making sure it is not an empty string
+          lineCount++;
+          const timeout = lineCount * millisecondInterval;
+          console.log(timeout);
+          setTimeout(() => {
+            console.log("starting");
+            if (e) {
+              e = e.replace(",", "");
+              e = e.replace(" TIE", "");
+              var elements = e.split("\t");
+
+              //If there is a tie, then add both towns. else, townNames is length 1 and has only that town.
+              var townNames;
+              if (elements[1].includes(" and ")) {
+                townNames = elements[1].split(" and ");
+              } else {
+                townNames = [elements[1]];
+              }
+
+              //for the town (or 2 towns if a tie), fetch from the API
+              townNames.forEach((e) => {
+                var str =
+                  "https://maps.googleapis.com/maps/api/geocode/json?address=" +
+                  e +
+                  ", " +
+                  stateName +
+                  "&key=" +
+                  apiKey;
+                fetch(str)
+                  .then((data) => data.json())
+                  .then((data) => {
+                    var s =
+                      e +
+                      "," +
+                      elements[2] +
+                      "," +
+                      data.results[0].geometry.location.lat +
+                      "," +
+                      data.results[0].geometry.location.lng +
+                      " <br>";
+                    document.getElementById("main").innerHTML += s;
+                    count++;
+                    countDOM.innerHTML = "Lines Counted: " + count;
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              });
+            }
+          }, timeout);
+          console.log("end");
+        });
+      });
+
+      document.getElementById("stateName").addEventListener("change", () => {
+        if (document.getElementById("stateName").value == "") {
+          document.getElementById("inputall").style.display = "none";
+        } else {
+          document.getElementById("inputall").style.display = "block";
+        }
+      });
+
+      function copyTextArea() {
+        document.getElementById("inputtext").value = document.getElementById(
+          "main"
+        ).textContent;
+        document.getElementById("inputtext").select();
+        document.execCommand("copy");
+        alert("Copied output to clipboard!");
+      }
+    </script>
+  </body>
+</html>
