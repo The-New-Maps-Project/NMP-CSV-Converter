@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>822GenerateCSV</title>
+    <title>The New Maps Project CSV Converter</title>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <h1>Generate CSV</h1>
+    <h1>CSV Converter and Location Finder v1.0 - The New Maps Project</h1>
+    <h4>Powered by Google Cloud</h4>
     <h3>Get the lat and lng of each city from Google Geocoding API</h3>
     <div>Must have a Google Cloud API Key to use</div>
     <p>
@@ -55,7 +56,7 @@
     <br />
     <br />
     <div id="count"></div>
-    <div id="main" style="padding: 30px; border: solid black 3px;">
+    <div id="main" style="padding: 30px; border: solid black 3px">
       <button type="button" id="copy-clipboard" onclick="copyTextArea()">
         Copy
       </button>
@@ -87,17 +88,26 @@
           setTimeout(() => {
             console.log("starting");
             if (e) {
-              e = e.replace(",", "");
               e = e.replace(" TIE", "");
               var elements = e.split("\t");
 
               //If there is a tie, then add both towns. else, townNames is length 1 and has only that town.
               var townNames;
               if (elements[1].includes(" and ")) {
-                townNames = elements[1].split(" and ");
+                townNames = elements[1].split(" and ")[0].split(","); // add elements before the "and"
+                townNames.push(elements[1].split(" and ")[1]); //add the element after the "and"
               } else {
                 townNames = [elements[1]];
               }
+              townNames = townNames.filter((el) => {
+                el = el.replace(" ", "");
+                return el !== "";
+              }); // remove all empty strings or spaces(an empty string evaluates to false)
+              console.log("TOWNNAMES: " + townNames);
+
+              elements.forEach((el) => {
+                el = el.replace(",", "");
+              });
 
               //for the town (or 2 towns if a tie), fetch from the API
               townNames.forEach((e) => {
