@@ -71,3 +71,16 @@
 #apikey-input input {
   width: 100%;
 }
+
+#additional-text-input {
+  padding: 15px;
+  border-radius: 10px;
+  background-color: lightgrey;
+  margin: 3vh 0 3vh 15px;
+  width: 600px;
+}
+
+#additional-text {
+  display: block;
+  width: 350px;
+}

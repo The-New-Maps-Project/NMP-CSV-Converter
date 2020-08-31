@@ -41,6 +41,15 @@
       BEWARE: each line counted is one geocoding API Call to this key
     </div>
 
+    <div id="additional-text-input">
+      <input
+        type="text"
+        placeholder="Additional Text to add to each city name Ex: (Chicago)"
+        id="additional-text"
+      />
+      Mainly for purposes of big cities divided into neighborhoods
+    </div>
+
     <div id="stateName-wrapper">
       <input
         type="text"
@@ -135,8 +144,11 @@
                 fetch(str)
                   .then((data) => data.json())
                   .then((data) => {
+                    var addText = document.getElementById("additional-text")
+                      .value;
                     var s =
                       e +
+                      addText +
                       "," +
                       elements[2] +
                       "," +
