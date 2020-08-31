@@ -8,6 +8,16 @@
   <body>
     <h1>CSV Converter and Location Finder v1.0 - The New Maps Project</h1>
     <h4>Powered by Google Cloud</h4>
+    <h2 style="font-weight: bolder; color: red">
+      Read the Github Repo's Documentation Before Using:
+      <a
+        target="_blank"
+        href="https://github.com/vincentcai48/The-New-Maps-Project-Generate-CSV-1.0"
+        >Github Repo</a
+      >
+    </h2>
+    <p>All Code is open source</p>
+    <br />
     <h3>Get the lat and lng of each city from Google Geocoding API</h3>
     <div>Must have a Google Cloud API Key to use</div>
     <p>
@@ -27,7 +37,7 @@
     </div>
 
     <div id="apikey-input">
-      <input type="text" placeholder="Google Cloud API Key" id="api-key" />
+      <input type="password" placeholder="Google Cloud API Key" id="api-key" />
       BEWARE: each line counted is one geocoding API Call to this key
     </div>
 
@@ -105,9 +115,13 @@
               }); // remove all empty strings or spaces(an empty string evaluates to false)
               console.log("TOWNNAMES: " + townNames);
 
-              elements.forEach((el) => {
-                el = el.replace(",", "");
+              console.log(elements);
+              elements = elements.map((el) => {
+                return el.replace(",", "");
               });
+
+              console.log(elements);
+              console.log(elements[2]);
 
               //for the town (or 2 towns if a tie), fetch from the API
               townNames.forEach((e) => {
