@@ -84,3 +84,7 @@
   display: block;
   width: 350px;
 }
+
+#isZipCode-container {
+  margin: 20px;
+}

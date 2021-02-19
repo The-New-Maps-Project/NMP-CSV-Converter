@@ -57,6 +57,11 @@
         id="stateName"
       />
     </div>
+    <div id="isZipCode-container">
+      OR: <input type="checkbox" id="isZipCode-checkbox" />
+      Use Zip Codes. Will look up the US zip code and output the name of the
+      municipality of the zip code in format: Municipality (zip code).
+    </div>
     <br />
 
     <div id="inputall">
@@ -89,6 +94,12 @@
           document.getElementById("millisecondInterval").value || 400;
         document.getElementById("wait").textContent = "Please Wait";
         const data = document.getElementById("inputtext").value;
+        const isZipCode = document.getElementById("isZipCode-checkbox").checked;
+        var addText = isZipCode
+          ? ",US"
+          : document.getElementById("additional-text").value;
+
+        console.log(addText);
         var lines = data.split("\n");
         var wait = (lines.length * millisecondInterval) / 1000;
         document.getElementById("wait").textContent =
@@ -134,6 +145,7 @@
 
               //for the town (or 2 towns if a tie), fetch from the API
               townNames.forEach((e) => {
+                e += addText;
                 var str =
                   "https://maps.googleapis.com/maps/api/geocode/json?address=" +
                   e +
@@ -146,9 +158,14 @@
                   .then((data) => {
                     var addText = document.getElementById("additional-text")
                       .value;
+                    e = isZipCode
+                      ? data.results[0]["address_components"][1]["long_name"] +
+                        " (" +
+                        e.replace(",US", "") +
+                        ")"
+                      : e;
                     var s =
                       e +
-                      addText +
                       "," +
                       elements[2] +
                       "," +
@@ -171,12 +188,25 @@
       });
 
       document.getElementById("stateName").addEventListener("change", () => {
-        if (document.getElementById("stateName").value == "") {
+        canPutData();
+      });
+
+      document
+        .getElementById("isZipCode-checkbox")
+        .addEventListener("change", () => {
+          canPutData();
+        });
+
+      function canPutData() {
+        if (
+          !document.getElementById("isZipCode-checkbox").checked &&
+          document.getElementById("stateName").value == ""
+        ) {
           document.getElementById("inputall").style.display = "none";
         } else {
           document.getElementById("inputall").style.display = "block";
         }
-      });
+      }
 
       function copyTextArea() {
         document.getElementById("inputtext").value = document.getElementById(
